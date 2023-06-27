@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>home</title>
+    <link rel="stylesheet" href="./css/index.css" />
+    <script src="./js/index_interactive.js" defer></script>
+    <script src="./js/index_login.js" defer></script>
+    <script src="./js/index_table2.js" defer></script>
+    <script src="./js/index_todoList.js" defer></script>
+
+    <style></style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>
+          <span>Chat`</span>
+          <span>Room</span>
+          <span>Project</span>
+          <hr />
+        </h1>
+        <p id="header_login">/Login/</p>
+        <p id="header_table">/Table/</p>
+        <p id="header_text">/Text/</p>
+        <p id="header_etc">/Todo List/</p>
+
+        <address>2023 LEE JAE YOUNG<br />ALL RIGHTS RESERVED.</address>
+      </header>
+      <!-- nav -->
+      <nav>
+        <ul>
+          <a href="#"></a>
+        </ul>
+      </nav>
+      <!-- section -->
+      <section>
+        <article id="article_login">
+          <div class="inner">
+            <div class="txt">
+              <h2>01</h2>
+              <p>
+                Login
+                <!-- Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
+                eveniet voluptativus tenetur. -->
+              </p>
+
+              <figure>
+                <img src="./이미지/img1.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        <article id="article_table">
+          <div class="inner">
+            <div class="txt">
+              <h2>02</h2>
+              <p>
+                Table
+                <!-- Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
+                eveniet voluptativus tenetur. -->
+              </p>
+              <figure>
+                <img src="./이미지/img2.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        <article id="article_text">
+          <div class="inner">
+            <div class="txt">
+              <h2>03</h2>
+              <p>
+                New Text
+                <!-- Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
+                eveniet voluptativus tenetur. -->
+              </p>
+              <figure>
+                <img src="./이미지/img3.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        <article id="article_etc">
+          <div class="inner">
+            <div class="txt">
+              <h2>04</h2>
+              <p>
+                Todo list
+                <!-- Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
+                eveniet voluptativus tenetur. -->
+              </p>
+              <figure>
+                <img src="./이미지/img4.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- aside -->
+      <div class="aside_div">
+        <aside id="aside_login">
+          <div class="txt">
+            <h1>01</h1>
+            <p id="aside_login1">Login</p>
+
+            <span id="close_login">CLOSE</span>
+          </div>
+          <figure id="figure_login">
+            <form>
+              <input
+                type="text"
+                placeholder="ID"
+                id="id"
+                minlength="4"
+                maxlength="15"
+              />
+              <br />
+              <input
+                type="password"
+                placeholder="PASSWORD"
+                id="password"
+                minlength="4"
+                maxlength="15"
+              />
+              <br />
+              <input type="submit" value="Login" id="loginbtn" />
+            </form>
+          </figure>
+        </aside>
+      </div>
+
+      <aside id="aside_table">
+        <div class="txt">
+          <h1>02</h1>
+          <p>Table</p>
+          <span id="close_table">CLOSE</span>
+        </div>
+        <figure id="figure_table">
+          <table>
+            <tr>
+              <td>NO</td>
+              <td>TITLE</td>
+              <td>NAME</td>
+              <td>COUNT</td>
+              <td>DATE</td>
+            </tr>
+          </table>
+        </figure>
+      </aside>
+
+      <aside id="aside_text">
+        <div class="txt">
+          <h1>03</h1>
+          <p>Text</p>
+          <hr />
+          <p id="send">Send</p>
+          <span id="close_text">CLOSE</span>
+        </div>
+        <figure id="figure_text">
+          <input type="text" placeholder="title" id="text_input" />
+          <textarea
+            id="text_textarea"
+            cols="30"
+            rows="10"
+            placeholder="note"
+          ></textarea>
+          <input id="text_name" type="text" placeholder="name" />
+          <input type="file" id="text_file" />
+        </figure>
+      </aside>
+
+      <aside id="aside_etc">
+        <div class="txt">
+          <h1>04</h1>
+          <p>Todo<br /><br />List</p>
+          <hr />
+          <p id="todo_send">Add</p>
+          <span id="close_etc">CLOSE</span>
+        </div>
+        <figure id="figure_todo">
+          <input id="todo_input" type="text" placeholder="내용 입력" />
+          <div id="todo_div"></div>
+        </figure>
+      </aside>
+    </main>
+  </body>
+  <script></script>
+</html>
