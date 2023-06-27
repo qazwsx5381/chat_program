@@ -34,15 +34,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   header_login.addEventListener("click", (e) => {
     aside_login.classList.add("on");
+    aside_table.classList.remove("on");
+    aside_text.classList.remove("on");
+    aside_etc.classList.remove("on");
   });
   header_table.addEventListener("click", (e) => {
     aside_table.classList.add("on");
+    aside_login.classList.remove("on");
+    aside_text.classList.remove("on");
+    aside_etc.classList.remove("on");
   });
   header_text.addEventListener("click", (e) => {
     aside_text.classList.add("on");
+    aside_table.classList.remove("on");
+    aside_login.classList.remove("on");
+    aside_etc.classList.remove("on");
   });
   header_etc.addEventListener("click", (e) => {
     aside_etc.classList.add("on");
+    aside_table.classList.remove("on");
+    aside_text.classList.remove("on");
+    aside_login.classList.remove("on");
   });
 
   close_login.addEventListener("click", (e) => {
