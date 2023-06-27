@@ -12,8 +12,8 @@ const io = new Server(server, {
   },
 });
 
-const messages = [];
-const user_msg = [];
+let messages = [];
+let user_msg = [];
 let usernameList = [];
 const chatBotMsg = ["안녕"];
 
@@ -60,12 +60,7 @@ io.on("connection", (socket) => {
     console.log("유저한테 받음:", data);
 
     console.log("방이름", roomName);
-    if (data.message == "안녕") {
-      io.to(roomName).emit(
-        "messages",
-        messages.push({ message: "꺼정" + "(챗봇)", id: "chat_bot" })
-      );
-    }
+
     usernameList.forEach((v) => {
       if (v.id === socket.id) {
         messages.push({
@@ -74,7 +69,12 @@ io.on("connection", (socket) => {
         });
       }
     });
-
+    if (data.message == "안녕") {
+      io.to(roomName).emit(
+        "messages",
+        messages.push({ message: "꺼정" + "(챗봇)", id: "chat_bot" })
+      );
+    }
     // 수신 받은 메시지의 목록을 클라이언트에게 돌려줌
     io.to(roomName).emit("messages", messages);
     // ===============================
@@ -101,9 +101,10 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("disconnecting", () => {
+  socket.on("disconnect", () => {
     socket.emit("leave", "55");
     console.log(`${socket.id}님이 방을 나가셨습니다.`);
+    messages = [];
   });
 });
 

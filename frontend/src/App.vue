@@ -1,77 +1,117 @@
 <template>
   <div>
+    <div class="example-modal-window" v-if="!state">
+      <p>버튼을 누르면 모달 대화 상자가 열립니다.</p>
+      <button @click="openModal">로그인</button>
+
+      <!-- 컴포넌트 MyModal -->
+      <MyModal @close="closeModal" v-if="modal">
+        <!-- default 슬롯 콘텐츠 -->
+        <div class="login_main">
+          <h2>로그인</h2>
+          <div class="login" v-if="!state">
+            <input
+              type="text"
+              v-model="username"
+              :disabled="state"
+              placeholder="입력이 없으면 익명으로 로그인 됩니다."
+              @keyup.enter="[login(), doSend()]"
+            />
+            <button @click="[login(), doSend()]">로그인</button>
+          </div>
+        </div>
+        <!-- /default -->
+        <!-- footer 슬롯 콘텐츠 -->
+        <template slot="footer">
+          <button @click="doSend">닫기</button>
+        </template>
+        <!-- /footer -->
+      </MyModal>
+      <hr />
+    </div>
     <div class="connect_server">
       <span>연결상태</span>
       <span>{{ state }}</span>
     </div>
-    <h2>로그인</h2>
-    <div v-if="!state">
-      <input type="text" v-model="username" :disabled="state" />
-      <button @click="login" :disabled="state">로그인</button>
-    </div>
-    <br /><br />
-    <hr />
-    <h2>메시지 전송</h2>
+    <!-- <div class="login_main">
+      <h2>로그인</h2>
+      <div class="login" v-if="!state">
+        <input
+          type="text"
+          v-model="username"
+          :disabled="state"
+          placeholder="입력이 없으면 익명으로 로그인 됩니다."
+        />
+        <button @click="login" :disabled="state">로그인</button>
+      </div>
+    </div> -->
     <div v-if="state">
-      <template v-if="user_id">
-        <input type="text" v-model="user_msg" :disabled="!state" />
-        <button @click="send_user_msg">전송</button>
-        <button @click="leaveChat">나가기</button>
-      </template>
-      <template v-else>
-        <input type="text" v-model="message" :disabled="!state" />
-        <button @click="sendChat">전송</button>
-        <button @click="leaveChat">나가기</button>
-      </template>
-
-      <div>테스트: {{ message }}</div>
-    </div>
-    <br /><br />
-    <hr />
-    <h2>대화</h2>
-    <ul>
-      <template v-for="v in messages" :key="v">
-        <template v-if="v.id === username">
-          <li style="color: red">{{ v.id }} : {{ v.message }}</li>
-        </template>
-        <template v-else-if="v.id === '익명' && username === ''">
-          <li style="color: red">{{ v.id }} : {{ v.message }}</li>
+      <h2>메시지 전송</h2>
+      <div v-if="state">
+        <template v-if="user_id">
+          <input type="text" v-model="user_msg" @keyup.enter="send_user_msg" />
+          <button @click="send_user_msg">전송</button>
+          <button @click="leaveChat">나가기</button>
         </template>
         <template v-else>
-          <li style="color: black">{{ v.id }} : {{ v.message }}</li>
+          <input type="text" v-model="message" @keyup.enter="sendChat" />
+          <button @click="sendChat">전송</button>
+          <button @click="leaveChat">나가기</button>
         </template>
-      </template>
-    </ul>
-    <hr />
-    <h2>개인메세지 {{ user_id }}</h2>
-    <ul>
-      <template v-for="v in msg" :key="v">
-        <li style="color: black">{{ v.username }} : {{ v.message }}</li>
-      </template>
-    </ul>
-    <button @click="user_id = ''">나가기</button>
-    <hr />
-    <h2>유저 리스트</h2>
-    <ul>
-      <template v-for="v in userList" :key="v">
-        <li @click="user_message(v.id)" v-if="v.username == username">
-          <b>{{ v.username }} : {{ v.id }}</b>
-        </li>
-        <li @click="user_message(v.id)" v-else>
-          {{ v.username }} : {{ v.id }}
-        </li>
-      </template>
-    </ul>
+
+        <div>테스트: {{ message }}</div>
+      </div>
+      <br /><br />
+      <hr />
+      <h2>대화</h2>
+      <ul>
+        <template v-for="v in messages" :key="v">
+          <template v-if="v.id === username">
+            <li style="color: red">{{ v.id }} : {{ v.message }}</li>
+          </template>
+          <template v-else-if="v.id === '익명' && username === ''">
+            <li style="color: red">{{ v.id }} : {{ v.message }}</li>
+          </template>
+          <template v-else>
+            <li style="color: black">{{ v.id }} : {{ v.message }}</li>
+          </template>
+        </template>
+      </ul>
+      <hr />
+      <h2>개인메세지 {{ user_id }}</h2>
+      <ul>
+        <template v-for="v in msg" :key="v">
+          <li style="color: black">{{ v.username }} : {{ v.message }}</li>
+        </template>
+      </ul>
+      <button @click="user_id = ''">나가기</button>
+      <hr />
+      <h2>유저 리스트</h2>
+      <ul>
+        <template v-for="v in userList" :key="v">
+          <li @click="user_message(v.id)" v-if="v.username == username">
+            <b>{{ v.username }} : {{ v.id }}</b>
+          </li>
+          <li @click="user_message(v.id)" v-else>
+            {{ v.username }} : {{ v.id }}
+          </li>
+        </template>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
 import { io } from "socket.io-client";
+import MyModal from "./components/MyModal.vue";
 
 export default {
   name: "App",
+  components: { MyModal },
   data() {
     return {
+      modal: false,
+      modal_msg: "",
       message: "",
       user_msg: "",
       username: JSON.parse(sessionStorage.getItem("userID"))?.username || "",
@@ -172,11 +212,24 @@ export default {
       this.state = false;
       this.socket.emit("leaveRoom", { room: "welcome" });
       sessionStorage.clear();
-      setTimeout(() => {
-        this.guideMsg = this.username + "님이 방을 나가셨습니다.";
-        console.log(this.guideMsg);
-        this.username = "";
-      }, 1000);
+      this.guideMsg = this.username + "님이 방을 나가셨습니다.";
+      console.log(this.guideMsg);
+      this.username = "";
+      this.messages = [];
+    },
+    openModal() {
+      this.modal = true;
+    },
+    closeModal() {
+      this.modal = false;
+    },
+    doSend() {
+      if (this.username === "") {
+        alert("익명님 반가워요.!");
+      } else {
+        alert(this.username + "님 반가워요.!");
+      }
+      this.closeModal();
     },
   },
 };
@@ -190,11 +243,26 @@ div.connect_server {
   align-items: center;
   flex-direction: column;
   width: 100px;
-  position:fixed;
+  position: fixed;
   top: 10px;
-  right:10px;
+  right: 10px;
+  padding: 10px;
 }
-
+div.login_main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+div.login_main h2 {
+  margin: 0;
+}
+div.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 li {
   list-style: none;
 }
