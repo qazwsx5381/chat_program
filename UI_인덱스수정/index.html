@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>home</title>
+    <link rel="stylesheet" href="./css/index.css" />
+    <script src="./js/index_interactive.js" defer></script>
+    <!-- <script src="./js/index_login.js" defer></script> -->
+    <!-- <script src="./js/index_table2.js" defer></script> -->
+    <script src="./js/index_todoList.js" defer></script>
+
+    <style></style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>
+          <span>Chat`</span>
+          <span>Room</span>
+          <span>Project</span>
+          <hr />
+        </h1>
+        <p id="header_login">/Login/</p>
+        <p id="header_table">/Chat`Room/</p>
+        <p id="header_text">/Healing`Movie/</p>
+        <p id="header_etc">/Memo/</p>
+
+        <address>
+          2023 DONSUN ACADEMY<br />PROJECT TEAM #3<br />
+          ALL RIGHT RESERVED.
+        </address>
+      </header>
+      <!-- nav -->
+      <!--
+      <nav>
+        <ul>
+          <a href="#"></a>
+        </ul>
+      </nav>
+-->
+      <!-- section -->
+      <section>
+        <article id="article_login">
+          <div class="inner">
+            <div class="txt">
+              <h2>01</h2>
+              <p>
+                Login
+                <!-- Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
+                eveniet voluptativus tenetur. -->
+              </p>
+
+              <figure>
+                <img src="./이미지/img1.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        <article id="article_table">
+          <div class="inner">
+            <div class="txt">
+              <h2>02</h2>
+              <p>
+                Chat`Room
+                <!-- Lorem, ipsum dolor sit amet consectetur adipisicing elit. In
+                eveniet voluptativus tenetur. -->
+              </p>
+              <figure>
+                <img src="./이미지/img2.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        <article id="article_text">
+          <div class="inner">
+            <div class="txt">
+              <h2>03</h2>
+              <p>Healing`Movie</p>
+              <figure>
+                <video id="video" src="./이미지/vid2.mp4" muted loop></video>
+              </figure>
+            </div>
+          </div>
+        </article>
+
+        <article id="article_etc">
+          <div class="inner">
+            <div class="txt">
+              <h2>04</h2>
+              <p>Memo</p>
+              <figure>
+                <img src="./이미지/img4.jfif" />
+              </figure>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- aside -->
+      <div class="aside_div">
+        <aside id="aside_login">
+          <div class="txt">
+            <h1>01</h1>
+            <p id="aside_login1">Login</p>
+
+            <span id="close_login">CLOSE</span>
+          </div>
+          <figure id="figure_login">
+            <form>
+              <input
+                type="text"
+                placeholder="ID"
+                id="id"
+                minlength="4"
+                maxlength="15"
+              />
+
+              <input
+                type="password"
+                placeholder="PASSWORD"
+                id="password"
+                minlength="4"
+                maxlength="15"
+              />
+              <br />
+              <input type="submit" value="Login" id="loginbtn" />
+            </form>
+          </figure>
+        </aside>
+      </div>
+
+      <aside id="aside_table">
+        <div class="txt">
+          <h1>02</h1>
+          <p>Chat`Room</p>
+          <span id="close_table">CLOSE</span>
+        </div>
+
+        <!----------------------- 채팅영역 ----------------------->
+        <figure id="figure_table">채팅영역</figure>
+      </aside>
+
+      <aside id="aside_text">
+        <div class="txt">
+          <h1>03</h1>
+          <p>Healing`<br /><br />Movie</p>
+
+          <span id="close_text">CLOSE</span>
+        </div>
+        <figure id="figure_text">
+          <video id="aside_video" src="./이미지/vid2.mp4" loop></video>
+        </figure>
+      </aside>
+
+      <aside id="aside_etc">
+        <div class="txt">
+          <h1>04</h1>
+          <p>Memo</p>
+
+          <p id="todo_send">Add</p>
+          <span id="close_etc">CLOSE</span>
+        </div>
+        <figure id="figure_todo">
+          <input id="todo_input" type="text" placeholder="내용 입력" />
+          <div id="todo_div"></div>
+        </figure>
+      </aside>
+    </main>
+  </body>
+  <script></script>
+</html>
