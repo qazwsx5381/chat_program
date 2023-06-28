@@ -38,10 +38,6 @@
     </div>
     <article class="chat_login">
       <h2 v-show="state">{{ username }} 님! 환영합니다.</h2>
-      <div v-if="!state">
-        <input type="text" v-model="username" :disabled="state" @keyup.enter="login" />
-        <button @click="login" :disabled="state">로그인</button>
-      </div>
     </article>
 
     <!-- 챗 룸 -->
@@ -132,15 +128,12 @@ export default {
     return {
       modal: false,
       modal_msg: "",
-      modal: false,
-      modal_msg: "",
       message: "",
       user_msg: "",
       username: JSON.parse(sessionStorage.getItem("userID"))?.username || "",
       socket: null,
       messages: [],
       userList: [],
-      ghost_user: false,
       ghost_user: false,
       guideMsg: "",
       user_id: "",
@@ -203,10 +196,7 @@ export default {
 
   /* 메소드 */
   methods: {
-    ghost() {
-      this.ghost_user = !this.ghost_user;
-      console.log(this.ghost_user);
-    },
+
     ghost() {
       this.ghost_user = !this.ghost_user;
       console.log(this.ghost_user);
@@ -218,7 +208,6 @@ export default {
       this.socket.emit("sendMessage", {
         message: this.message,
         username: this.username,
-        ghost: this.ghost_user,
         ghost: this.ghost_user,
       });
       console.log(this.message);
