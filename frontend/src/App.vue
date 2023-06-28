@@ -15,9 +15,12 @@
               v-model="username"
               :disabled="state"
               required
-              @keyup.enter="[login(), doSend()]"
+              @keyup.enter="[login(), doSend(), handleClick()]"
             />
-            <button @click="[doSend(), login()]" :disabled="!username">
+            <button
+              @click="[doSend(), login(), handleClick()]"
+              :disabled="!username"
+            >
               로그인
             </button>
           </div>
@@ -54,16 +57,24 @@
         <template v-if="user_id">
           <label for="ghost">익명</label>
           <input type="checkbox" @click="ghost()" id="ghost" />
-          <input type="text" v-model="user_msg" @keyup.enter="send_user_msg" />
-          <button @click="send_user_msg">전송</button>
+          <input
+            type="text"
+            v-model="user_msg"
+            @keyup.enter="[send_user_msg, handleClick()]"
+          />
+          <button @click="[send_user_msg, handleClick()]">전송</button>
           <button @click="leaveChat">나가기</button>
         </template>
         <!-- 전체메세지 -->
         <template v-else>
           <label for="ghost">익명</label>
           <input type="checkbox" @click="ghost()" id="ghost" />
-          <input type="text" v-model="message" @keyup.enter="sendChat" />
-          <button @click="sendChat">전송</button>
+          <input
+            type="text"
+            v-model="message"
+            @keyup.enter="[sendChat, handleClick()]"
+          />
+          <button @click="[sendChat, handleClick()]">전송</button>
           <button @click="leaveChat">나가기</button>
         </template>
 
@@ -74,10 +85,18 @@
       <h2>대화</h2>
       <ul>
         <template v-for="v in messages" :key="v">
-          <template v-if="v.ghost === false && v.id === username">
+          <template
+            v-if="
+              v.ghost === false && v.user_data === login_id && v.id === username
+            "
+          >
             <li style="color: red">{{ v.id }} : {{ v.message }}</li>
           </template>
-          <template v-else-if="v.ghost === true && v.id === username">
+          <template
+            v-else-if="
+              v.ghost === true && v.user_data === login_id && v.id === username
+            "
+          >
             <li style="color: rgb(0, 163, 82)">익명 : {{ v.message }}</li>
           </template>
           <template v-else-if="v.ghost === true">
@@ -109,6 +128,7 @@
         </template>
       </ul>
     </div>
+    <span ref="targetRef"></span>
   </div>
 </template>
 
@@ -179,6 +199,9 @@ export default {
     }
   },
   methods: {
+    handleClick() {
+      this.$refs.targetRef.scrollIntoView({ behavior: "smooth" });
+    },
     ghost() {
       this.ghost_user = !this.ghost_user;
       console.log(this.ghost_user);
@@ -190,6 +213,7 @@ export default {
         message: this.message,
         username: this.username,
         ghost: this.ghost_user,
+        id: this.login_id,
       });
       console.log(this.message);
       this.message = "";

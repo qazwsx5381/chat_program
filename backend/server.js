@@ -90,6 +90,7 @@ io.on("connection", (socket) => {
           message: data.message,
           id: data.username,
           ghost: data.ghost,
+          user_data: data.id,
         });
       }
     });
