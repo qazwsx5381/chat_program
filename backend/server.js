@@ -12,8 +12,8 @@ const io = new Server(server, {
   },
 });
 
-const messages = [];
-const user_msg = [];
+let messages = [];
+let user_msg = [];
 let usernameList = [];
 const chatBotMsg = ["안녕"];
 
@@ -28,6 +28,29 @@ io.on("connection", (socket) => {
     }
     console.log("유저이름:", usernameList);
     io.to(roomName).emit("userList", usernameList);
+    messages.push({
+      message: `${username ? username : "익명"}님 반갑습니다.`,
+      id: "SYSTEM",
+    });
+    io.to(roomName).emit("messages", messages);
+    setTimeout(() => {
+      messages.push({
+        message: `${
+          username ? username : "익명"
+        }님이 접속 후 30초이 경과하였습니다.`,
+        id: "SYSTEM",
+      });
+      io.to(roomName).emit("messages", messages);
+    }, 30 * 1000);
+    setTimeout(() => {
+      messages.push({
+        message: `${
+          username ? username : "익명"
+        }님이 접속 후 1분이 경과하였습니다.`,
+        id: "SYSTEM",
+      });
+      io.to(roomName).emit("messages", messages);
+    }, 60 * 1000);
   });
 
   // 방 가입
@@ -64,7 +87,8 @@ io.on("connection", (socket) => {
       if (v.id === socket.id) {
         messages.push({
           message: data.message,
-          id: v.username,
+          id: data.username,
+          ghost: data.ghost,
         });
       }
     });
@@ -74,7 +98,6 @@ io.on("connection", (socket) => {
         messages.push({ message: "꺼정" + "(챗봇)", id: "chat_bot" })
       );
     }
-
     // 수신 받은 메시지의 목록을 클라이언트에게 돌려줌
     io.to(roomName).emit("messages", messages);
     // ===============================
@@ -101,9 +124,15 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("disconnecting", () => {
+  socket.on("disconnect", () => {
     socket.emit("leave", "55");
     console.log(`${socket.id}님이 방을 나가셨습니다.`);
+    usernameList.forEach((v, i) => {
+      if (socket.id === v.id) {
+        usernameList.splice(i, 1);
+        io.to(roomName).emit("userList", usernameList);
+      }
+    });
   });
 });
 
