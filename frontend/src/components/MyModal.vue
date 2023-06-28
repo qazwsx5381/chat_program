@@ -31,6 +31,8 @@
   }
 
   &-window {
+    width:50%;
+    height:30%;
     background: #fff;
     border-radius: 4px;
     overflow: hidden;
@@ -42,10 +44,15 @@
 
   &-footer {
     background: #ccc;
-    padding: 10px;
+    padding: 10px 0;
     text-align: right;
+    position: fixed;
+    display:flex;
+    justify-content:center;
+    width:50%;
   }
 }
+
 
 // 오버레이 트랜지션
 .modal-enter-active, .modal-leave-active {
