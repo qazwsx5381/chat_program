@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="example-modal-window" v-if="!state">
-      <p>버튼을 누르면 모달 대화 상자가 열립니다.</p>
+      <p>버튼을 누르면 로그인 창이 열립니다.</p>
       <button @click="openModal">로그인</button>
 
       <!-- 컴포넌트 MyModal -->
@@ -14,10 +14,12 @@
               type="text"
               v-model="username"
               :disabled="state"
-              placeholder="입력이 없으면 익명으로 로그인 됩니다."
+              required
               @keyup.enter="[login(), doSend()]"
             />
-            <button @click="[login(), doSend()]">로그인</button>
+            <button @click="[doSend(), login()]" :disabled="!username">
+              로그인
+            </button>
           </div>
         </div>
         <!-- /default -->
@@ -48,12 +50,18 @@
     <div v-if="state">
       <h2>메시지 전송</h2>
       <div v-if="state">
+        <!-- 개인메세지 -->
         <template v-if="user_id">
+          <label for="ghost">익명</label>
+          <input type="checkbox" @click="ghost()" id="ghost" />
           <input type="text" v-model="user_msg" @keyup.enter="send_user_msg" />
           <button @click="send_user_msg">전송</button>
           <button @click="leaveChat">나가기</button>
         </template>
+        <!-- 전체메세지 -->
         <template v-else>
+          <label for="ghost">익명</label>
+          <input type="checkbox" @click="ghost()" id="ghost" />
           <input type="text" v-model="message" @keyup.enter="sendChat" />
           <button @click="sendChat">전송</button>
           <button @click="leaveChat">나가기</button>
@@ -66,11 +74,14 @@
       <h2>대화</h2>
       <ul>
         <template v-for="v in messages" :key="v">
-          <template v-if="v.id === username">
+          <template v-if="v.ghost === false && v.id === username">
             <li style="color: red">{{ v.id }} : {{ v.message }}</li>
           </template>
-          <template v-else-if="v.id === '익명' && username === ''">
-            <li style="color: red">{{ v.id }} : {{ v.message }}</li>
+          <template v-else-if="v.ghost === true && v.id === username">
+            <li style="color: rgb(0, 163, 82)">익명 : {{ v.message }}</li>
+          </template>
+          <template v-else-if="v.ghost === true">
+            <li style="color: blue">익명 : {{ v.message }}</li>
           </template>
           <template v-else>
             <li style="color: black">{{ v.id }} : {{ v.message }}</li>
@@ -89,7 +100,7 @@
       <h2>유저 리스트</h2>
       <ul>
         <template v-for="v in userList" :key="v">
-          <li @click="user_message(v.id)" v-if="v.username == username">
+          <li @click="user_message(v.id)" v-if="v.id == login_id">
             <b>{{ v.username }} : {{ v.id }}</b>
           </li>
           <li @click="user_message(v.id)" v-else>
@@ -118,9 +129,10 @@ export default {
       socket: null,
       messages: [],
       userList: [],
-      msg: [],
+      ghost_user: false,
       guideMsg: "",
       user_id: "",
+      login_id: "",
       state: JSON.parse(sessionStorage.getItem("userID"))?.state || false,
     };
   },
@@ -134,6 +146,7 @@ export default {
     this.socket.on("messages", (messages) => {
       console.log("서버에서 받음:", messages);
       this.messages = messages;
+      console.log(messages);
     });
     this.socket.on("userList", (userList) => {
       console.log("서버에서 유저 정보를 받음:", userList);
@@ -144,6 +157,9 @@ export default {
       console.log("개인:", msg);
       this.msg = msg;
     });
+    this.socket.on("connect", () => {
+      this.login_id = this.socket.id;
+    });
   },
 
   mounted() {
@@ -152,18 +168,28 @@ export default {
       console.log("login(): 로그인 유저정보를 서버로 보냄");
 
       // 로그인 상태가 true 라면 welcome 방에 계속 상주한다.
-      if (getUserInfo.state)
-        this.socket.emit("roomJoin", { room: "welcome", userID: getUserInfo });
+      if (getUserInfo.state) {
+        this.socket.emit("roomJoin", {
+          room: "welcome",
+          userID: getUserInfo,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
   },
   methods: {
+    ghost() {
+      this.ghost_user = !this.ghost_user;
+      console.log(this.ghost_user);
+    },
     sendChat() {
       console.log("sendChat() :서버로 데이터 보냄");
+      console.log(this.ghost_user);
       this.socket.emit("sendMessage", {
         message: this.message,
         username: this.username,
+        ghost: this.ghost_user,
       });
       console.log(this.message);
       this.message = "";
@@ -199,6 +225,7 @@ export default {
       this.socket.emit("roomJoin", { room: "welcome", userID: getUserInfo });
       this.socket.emit("loginInfo", this.username);
     },
+
     // 개인 메세지
     user_message(id) {
       // 해당 유저 정보를 서버에 보내는 동시에 welcome 방에 입장
@@ -215,7 +242,6 @@ export default {
       this.guideMsg = this.username + "님이 방을 나가셨습니다.";
       console.log(this.guideMsg);
       this.username = "";
-      this.messages = [];
     },
     openModal() {
       this.modal = true;
