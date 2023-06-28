@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const article = document.querySelector("#article_text");
   const aside_video = document.querySelector("#aside_video");
   const video = document.querySelector("#video");
+  
   //메인-마우스 호버 동영상 재생
   article.addEventListener("mouseenter", () => {
     video.play();
@@ -100,8 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-const login2 = document.querySelector("#aside_login2");
+// const login2 = document.querySelector("#aside_login2");
 
-login2.addEventListener("click", (e) => {
-  aside_login.classList.remove("on");
-});
+// login2.addEventListener("click", (e) => {
+//   aside_login.classList.remove("on");
+// });
