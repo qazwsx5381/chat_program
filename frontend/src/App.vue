@@ -1,66 +1,62 @@
 <template>
   <div>
-    <article class="connect_server">
-      <span>연결상태 <br> {{ state }}</span>
-    </article>
-    <!-- 로그인 -->
-    <section class="chat_login">
-      <h2>로그인</h2>
+    <div class="connect_server">
+      <span>연결상태</span>
+      <span v-if="state" class="connect_state_true">{{ state }}</span>
+      <span v-if="!state" class="connect_state_false">{{ state }}</span>
+    </div>
+    <article class="chat_login">
+      <h2 v-show="state">{{ username }} 님! 환영합니다.</h2>
       <div v-if="!state">
-        <input type="text" v-model="username" :disabled="state" />
+        <input type="text" v-model="username" :disabled="state" @keyup.enter="login" />
         <button @click="login" :disabled="state">로그인</button>
       </div>
-    </section>
+    </article>
 
-    <!-- 채팅방 -->
+    <!-- 챗 룸 -->
     <section class="chat_room">
+
+      <!-- 채팅 리스트 -->
       <div class="chat_room_msg_container">
         <ul class="chat_room_ul">
           <template v-for="v in messages" :key="v">
-            <!-- 본인 -->
             <template v-if="v.id === username">
-              <li class="chat_room_myorBot_msg msg_common">
-                <span class="chat_room_common_name my_name">{{ v.id }} {{ currnetTime }}</span>
-                <p class="chat_room_common_message my_message">{{ v.message }}</p>
+              <li class="msg_common chat_room_myorBot_msg">
+                <span class="chat_room_common_name my_name">{{ v.id }}</span>
+                <p class="chat_room_common_message my_message"> {{ v.message }}</p>
               </li>
             </template>
-            <!-- 익명 유저 -->
             <template v-else-if="v.id === '익명' && username === ''">
-              <li class="chat_room_myorBot_msg msg_common" style="color: red"> <span class="chat_room_common_name">{{ v.id
-              }}<span v-if="v.id === 'chat_bot'">🤖</span></span>
-                <p class="chat_room_common_message">{{ v.message }}</p>
+              <li class="msg_common chat_room_myorBot_msg">
+                <span class="chat_room_common_name">{{ v.id }}</span>
+                <p class="chat_room_common_message"> {{ v.message }}</p>
               </li>
             </template>
-            <!-- 기명 유저 -->
             <template v-else>
-              <li class="chat_room_other_msg msg_common" style="color: black"> <span class="chat_room_common_name">{{ v.id
-              }}</span>
-                <p class="chat_room_common_message">{{ v.message }}</p>
+              <li class="msg_common">
+                <span class="chat_room_common_name chat_room_myorBot_msg">{{ v.id }}</span>
+                <p class="chat_room_common_message chat_room_other_msg"> {{ v.message }}</p>
               </li>
             </template>
           </template>
         </ul>
       </div>
-      <div v-if="state">
+      <!-- 메시지 전송 -->
+      <div class="chat_room_form" v-if="state">
         <template v-if="user_id">
-          <div class="chat_room_form">
-            <input class="chat_room_input" type="text" v-model="user_msg" :disabled="!state" />
-            <button @click="send_user_msg">전송</button>
-            <button @click="leaveChat">나가기</button>
-          </div>
+          <input class="chat_room_input" type="text" v-model="user_msg" :disabled="!state" @keyup.enter="send_user_msg" />
+          <button @click="send_user_msg">전송</button>
+          <button @click="leaveChat">나가기</button>
         </template>
         <template v-else>
-          <div class="chat_room_form">
-            <input class="chat_room_input" type="text" v-model="message" :disabled="!state" />
-            <button @click="sendChat">전송</button>
-            <button @click="leaveChat">나가기</button>
-          </div>
+          <input class="chat_room_input" type="text" v-model="message" :disabled="!state" @keyup.enter="sendChat" />
+          <button @click="sendChat">전송</button>
+          <button @click="leaveChat">나가기</button>
         </template>
-        <div>테스트: {{ message }}</div>
       </div>
     </section>
 
-    <!-- 개인 메시지 -->
+    <!-- 개인메시지 -->
     <section class="chat_user_message">
       <h2>개인메세지 {{ user_id }}</h2>
       <ul>
@@ -72,44 +68,50 @@
     </section>
 
 
-    <article class="menu_icon" @click="isOpen = !isOpen">{{ userList.length }}명 <br>접속중</article>
+    <article class="menu_icon" @click="isOpen = !isOpen">{{ userList.length }}명<br>접속중</article>
     <section class="chat_user_list" v-show="isOpen">
-      <h2 class="user_list_title">유저 리스트</h2>
-      <hr>
-      <ul>
+      <h2>유저 리스트</h2>
+      <ul class="chat_user_list_ul">
         <template v-for="v in userList" :key="v">
-          <!-- 본인 -->
           <li class="list_item" @click="user_message(v.id)" v-if="v.username == username">
-            <b>{{ v.username }}({{ v.id }})</b>
+            <b>{{ v.username }} : {{ v.id }}</b>
           </li>
-          <!-- 다른 유저 -->
           <li class="list_item" @click="user_message(v.id)" v-else>
-            {{ v.username }}({{ v.id }})
+            {{ v.username }} : {{ v.id }}
           </li>
         </template>
       </ul>
     </section>
-
+    <span style="display:none;" scrollIntoView></span>
+    <article class="shift_btn_container">
+      <span @click="top()">top</span>
+      <span @click="bot()">bot</span>
+    </article>
   </div>
 </template>
 
 <script>
 import { io } from "socket.io-client";
+import MyModal from "./components/MyModal.vue"
 
 export default {
   name: "App",
+  components: [MyModal],
   data() {
     return {
+      modal: false,
+      modal_msg: "",
       message: "",
       user_msg: "",
       username: JSON.parse(sessionStorage.getItem("userID"))?.username || "",
       socket: null,
       messages: [],
       userList: [],
-      msg: [],
+      ghost_user: false,
       guideMsg: "",
       user_id: "",
       isOpen: false,
+      login_id: "",
       state: JSON.parse(sessionStorage.getItem("userID"))?.state || false,
     };
   },
@@ -123,6 +125,7 @@ export default {
     this.socket.on("messages", (messages) => {
       console.log("서버에서 받음:", messages);
       this.messages = messages;
+      console.log(messages);
     });
     this.socket.on("userList", (userList) => {
       console.log("서버에서 유저 정보를 받음:", userList);
@@ -133,16 +136,22 @@ export default {
       console.log("개인:", msg);
       this.msg = msg;
     });
+    this.socket.on("connect", () => {
+      this.login_id = this.socket.id;
+    });
   },
 
   mounted() {
     try {
       const getUserInfo = JSON.parse(sessionStorage.getItem("userID")) || "";
       console.log("login(): 로그인 유저정보를 서버로 보냄");
-
       // 로그인 상태가 true 라면 welcome 방에 계속 상주한다.
-      if (getUserInfo.state)
-        this.socket.emit("roomJoin", { room: "welcome", userID: getUserInfo });
+      if (getUserInfo.state) {
+        this.socket.emit("roomJoin", {
+          room: "welcome",
+          userID: getUserInfo,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -150,14 +159,22 @@ export default {
 
   /* 메소드 */
   methods: {
+    ghost() {
+      this.ghost_user = !this.ghost_user;
+      console.log(this.ghost_user);
+    },
     sendChat() {
       console.log("sendChat() :서버로 데이터 보냄");
+      console.log(this.ghost_user);
       this.socket.emit("sendMessage", {
         message: this.message,
         username: this.username,
+        ghost: this.ghost_user,
       });
       console.log(this.message);
       this.message = "";
+
+
     },
 
     send_user_msg() {
@@ -172,6 +189,7 @@ export default {
 
     /* 로그인 기능을 구현 */
     login() {
+
       // 로그인 상태를 true 로
       this.state = true;
       // 유저의 로그인 정보를 JSON 으로 변환
@@ -189,7 +207,9 @@ export default {
       console.log("login(): 로그인 유저정보를 서버로 보냄");
       this.socket.emit("roomJoin", { room: "welcome", userID: getUserInfo });
       this.socket.emit("loginInfo", this.username);
+
     },
+
     // 개인 메세지
     user_message(id) {
       // 해당 유저 정보를 서버에 보내는 동시에 welcome 방에 입장
@@ -203,12 +223,34 @@ export default {
       this.state = false;
       this.socket.emit("leaveRoom", { room: "welcome" });
       sessionStorage.clear();
-      setTimeout(() => {
-        this.guideMsg = this.username + "님이 방을 나가셨습니다.";
-        console.log(this.guideMsg);
-        this.username = "";
-      }, 1000);
+      this.guideMsg = this.username + "님이 방을 나가셨습니다.";
+      console.log(this.guideMsg);
+      this.username = "";
+
+
+      window.location.reload()
     },
+    openModal() {
+      this.modal = true;
+    },
+    closeModal() {
+      this.modal = false;
+    },
+    doSend() {
+      if (this.username === "") {
+        alert("익명님 반가워요.!");
+      } else {
+        alert(this.username + "님 반가워요.!");
+      }
+      this.closeModal();
+    },
+
+    top() {
+      window.scrollTo({ 'top': 0, behavior: 'smooth' })
+    },
+    bot() {
+      window.scrollTo({ 'top': 30000, behavior: 'smooth' })
+    }
   },
 };
 </script>
@@ -247,16 +289,40 @@ body::-webkit-scrollbar-button {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 60px;
-  font-size: 14px;
+  width: 48px;
+  font-size: 13px;
   position: fixed;
-  padding: 3px 3px;
-  top: 3%;
-  right: 15px;
+  top: 25px;
+  right: 14px;
+  padding: 10px;
 }
 
-.connect_server span {
-  text-align: center;
+.connect_server .connect_state_true {
+  color: blue;
+  font-weight: 600;
+}
+
+.connect_server .connect_state_false {
+  color: red;
+  font-weight: 600;
+}
+
+.chat_login .login_main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.chat_login .login_main h2 {
+  margin: 0;
+}
+
+.chat_login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 li {
@@ -270,20 +336,24 @@ li {
 
 /* 채팅방 */
 .chat_room {
+  box-shadow: 0 0 5px 3px inset rgba(0, 0, 0, 0.637);
   border-radius: 10px;
   background-color: #313338;
   border: 1px solid black;
   min-height: 100vh;
   height: 100%;
+  padding: 10px;
 }
 
 .chat_room_form {
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  position: relative;
-  left: 50%;
-  transform: translate(-50%);
+  position: sticky;
   max-width: 70%;
-  margin-top: 15px;
+  padding: 10px 40px;
+  border-radius: 5px;
+  margin: 15px auto;
   width: 100%;
   bottom: 0;
 }
@@ -294,19 +364,23 @@ li {
 }
 
 .chat_room_form .chat_room_input {
-  padding: 10px;
+  padding: 15px;
   width: 100%;
   min-width: 200px;
   border-radius: 20px;
-  background-color: #5a5b63;
-  color: white;
+  background-color: #8a8b8f;
+  color: rgb(0, 0, 0);
   border: none;
-  margin-right: 10px;
+  margin-right: 15px;
+}
+
+.chat_room_form .chat_room_input::placeholder{
+  color:rgb(178, 176, 176)
 }
 
 .chat_room_form button {
   border: none;
-  min-width: 70px;
+  min-width: 65px;
   margin: 2px;
   border-radius: 15px;
   transition: 0.5s;
@@ -336,10 +410,15 @@ li {
 
 .chat_room_common_name {
   position: absolute;
-  top: -8px;
-  left: 5px;
+  top: 5px;
+  left: -5px;
   font-weight: 700;
   color: white;
+}
+
+.my_name {
+  top: -5px;
+  left: 5px;
 }
 
 .my_name::after {
@@ -359,7 +438,6 @@ li {
 }
 
 /* 나의 메시지 */
-
 .chat_room_myorBot_msg {
   padding: 5px;
   max-width: 60%;
@@ -375,14 +453,12 @@ li {
 }
 
 
-
 /* 개인 메시지 */
 .chat_user_message {
   display: none;
 }
 
-/* 유저 목록 */
-
+/*============== 유저 목록 */
 /* 메뉴 아이콘 */
 .menu_icon {
   cursor: pointer;
@@ -398,8 +474,6 @@ li {
   top: 10%;
 
 }
-
-
 
 .chat_user_list {
   box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.52);
@@ -426,7 +500,39 @@ li {
 
 .chat_user_list .list_item {
   background-color: white;
+  border: none;
   margin: 5px 0;
 
+}
+
+
+/* 이동 버튼 컨테이너 */
+.shift_btn_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+
+  position: fixed;
+  border-radius: 20px;
+
+  right: 20px;
+  bottom: 30px;
+}
+
+.shift_btn_container span {
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.505);
+  width: 100%;
+  margin: 5px;
+  border: 1px solid white;
+  color: white;
+  padding: 3px 0;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.shift_btn_container span:hover {
+  background-color: goldenrod;
 }
 </style>
