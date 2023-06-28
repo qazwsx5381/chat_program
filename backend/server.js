@@ -83,6 +83,10 @@ io.on("connection", (socket) => {
     console.log("유저한테 받음:", data);
 
     console.log("방이름", roomName);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5671c0db2a57e11a73003c450d386e182376d17b
     usernameList.forEach((v) => {
       if (v.id === socket.id) {
         messages.push({

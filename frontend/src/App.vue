@@ -1,5 +1,36 @@
 <template>
   <div>
+    <div class="example-modal-window" v-if="!state">
+      <p>버튼을 누르면 로그인 창이 열립니다.</p>
+      <button @click="openModal">로그인</button>
+
+      <!-- 컴포넌트 MyModal -->
+      <MyModal @close="closeModal" v-if="modal">
+        <!-- default 슬롯 콘텐츠 -->
+        <div class="login_main">
+          <h2>로그인</h2>
+          <div class="login" v-if="!state">
+            <input
+              type="text"
+              v-model="username"
+              :disabled="state"
+              required
+              @keyup.enter="[login(), doSend()]"
+            />
+            <button @click="[doSend(), login()]" :disabled="!username">
+              로그인
+            </button>
+          </div>
+        </div>
+        <!-- /default -->
+        <!-- footer 슬롯 콘텐츠 -->
+        <template slot="footer">
+          <button @click="doSend">닫기</button>
+        </template>
+        <!-- /footer -->
+      </MyModal>
+      <hr />
+    </div>
     <div class="connect_server">
       <span>연결상태</span>
       <span v-if="state" class="connect_state_true">{{ state }}</span>
@@ -101,12 +132,15 @@ export default {
     return {
       modal: false,
       modal_msg: "",
+      modal: false,
+      modal_msg: "",
       message: "",
       user_msg: "",
       username: JSON.parse(sessionStorage.getItem("userID"))?.username || "",
       socket: null,
       messages: [],
       userList: [],
+      ghost_user: false,
       ghost_user: false,
       guideMsg: "",
       user_id: "",
@@ -126,6 +160,7 @@ export default {
       console.log("서버에서 받음:", messages);
       this.messages = messages;
       console.log(messages);
+      console.log(messages);
     });
     this.socket.on("userList", (userList) => {
       console.log("서버에서 유저 정보를 받음:", userList);
@@ -135,6 +170,9 @@ export default {
     this.socket.on("user_messages", (msg) => {
       console.log("개인:", msg);
       this.msg = msg;
+    });
+    this.socket.on("connect", () => {
+      this.login_id = this.socket.id;
     });
     this.socket.on("connect", () => {
       this.login_id = this.socket.id;
@@ -152,6 +190,12 @@ export default {
           userID: getUserInfo,
         });
       }
+      if (getUserInfo.state) {
+        this.socket.emit("roomJoin", {
+          room: "welcome",
+          userID: getUserInfo,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -163,12 +207,18 @@ export default {
       this.ghost_user = !this.ghost_user;
       console.log(this.ghost_user);
     },
+    ghost() {
+      this.ghost_user = !this.ghost_user;
+      console.log(this.ghost_user);
+    },
     sendChat() {
       console.log("sendChat() :서버로 데이터 보냄");
+      console.log(this.ghost_user);
       console.log(this.ghost_user);
       this.socket.emit("sendMessage", {
         message: this.message,
         username: this.username,
+        ghost: this.ghost_user,
         ghost: this.ghost_user,
       });
       console.log(this.message);
@@ -209,6 +259,7 @@ export default {
       this.socket.emit("loginInfo", this.username);
 
     },
+
 
     // 개인 메세지
     user_message(id) {
@@ -324,7 +375,6 @@ body::-webkit-scrollbar-button {
   align-items: center;
   flex-direction: column;
 }
-
 li {
   list-style: none;
 }

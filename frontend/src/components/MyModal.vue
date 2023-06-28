@@ -31,8 +31,11 @@
   }
 
   &-window {
+<<<<<<< HEAD
     width:50%;
     height:30%;
+=======
+>>>>>>> 5671c0db2a57e11a73003c450d386e182376d17b
     background: #fff;
     border-radius: 4px;
     overflow: hidden;
@@ -44,6 +47,7 @@
 
   &-footer {
     background: #ccc;
+<<<<<<< HEAD
     padding: 10px 0;
     text-align: right;
     position: fixed;
@@ -54,6 +58,13 @@
 }
 
 
+=======
+    padding: 10px;
+    text-align: right;
+  }
+}
+
+>>>>>>> 5671c0db2a57e11a73003c450d386e182376d17b
 // 오버레이 트랜지션
 .modal-enter-active, .modal-leave-active {
   transition: opacity 0.4s;
