@@ -89,6 +89,7 @@ io.on("connection", (socket) => {
           message: data.message,
           id: data.username,
           ghost: data.ghost,
+          user_data: data.id,
         });
       }
     });
@@ -139,4 +140,3 @@ io.on("connection", (socket) => {
 server.listen(8001, () => {
   console.log("----서버 정상 오픈----");
 });
-

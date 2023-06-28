@@ -3,7 +3,7 @@
     <div class="modal modal-overlay" @click.self="$emit('close')">
       <div class="modal-window">
         <div class="modal-content">
-          <slot/>
+          <slot />
         </div>
         <footer class="modal-footer">
           <slot name="footer">
@@ -15,61 +15,67 @@
   </transition>
 </template>
 
-<style lang="stylus" scoped>
-.modal {
-  &.modal-overlay {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    z-index: 30;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-  }
-
-  &-window {
-    width:50%;
-    height:30%;
-    background: #fff;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  &-content {
-    padding: 10px 20px;
-  }
-
-  &-footer {
-    background: #ccc;
-    padding: 10px 0;
-    text-align: right;
-    position: fixed;
-    display:flex;
-    justify-content:center;
-    width:50%;
-  }
+<style scoped>
+div.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-width: 350px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
 }
 
+div.modal-window {
+  width: 50%;
+  min-width: 350px;
+  height: 30%;
+  background: #fff;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 35%;
+}
 
-// 오버레이 트랜지션
-.modal-enter-active, .modal-leave-active {
+div.modal-content {
+  padding: 10px 20px;
+}
+
+footer.modal-footer {
+  background: #ccc;
+  padding: 10px 0;
+  text-align: right;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  min-width: 350px;
+  bottom: 35%;
+}
+
+/* 오버레이 트랜지션 */
+.modal-enter-active,
+.modal-leave-active {
   transition: opacity 0.4s;
 
-  // 오버레이에 포함되어 있는 모달 윈도의 트랜지션
+  /* 오버레이에 포함되어 있는 모달 윈도의 트랜지션 */
   .modal-window {
     transition: opacity 0.4s, transform 0.4s;
   }
 }
 
-// 딜레이가 적용된 모달 윈도가 제거된 후에 오버레이가 사라짐
+/* 딜레이가 적용된 모달 윈도가 제거된 후에 오버레이가 사라짐 */
 .modal-leave-active {
   transition: opacity 0.6s ease 0.4s;
 }
 
-.modal-enter, .modal-leave-to {
+.modal-enter,
+.modal-leave-to {
   opacity: 0;
 
   .modal-window {
