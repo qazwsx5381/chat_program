@@ -33,13 +33,20 @@ div.modal-overlay {
 div.modal-window {
   width: 50%;
   min-width: 350px;
+  max-width: 380px;
+  min-height: 35%;
   height: 30%;
-  background: #fff;
+  background:  #fff;
   border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
   bottom: 35%;
+  box-shadow: 15px 15px 5px 2px rgba(0, 0, 0, 0.664);
+}
+
+div.modal-window h2{
+
 }
 
 div.modal-content {
@@ -48,6 +55,7 @@ div.modal-content {
 
 footer.modal-footer {
   background: #ccc;
+  max-width: 380px;
   padding: 10px 0;
   text-align: right;
   position: fixed;
@@ -55,7 +63,9 @@ footer.modal-footer {
   justify-content: center;
   width: 50%;
   min-width: 350px;
-  bottom: 35%;
+  bottom: 32.5%;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 /* 오버레이 트랜지션 */

@@ -38,7 +38,9 @@
       <span v-if="!state" class="connect_state_false">{{ state }}</span>
     </div>
     <article class="chat_login">
-      <h2 v-show="state">{{ username }} 님! 환영합니다.</h2>
+      <h2 v-show="state">
+        <span class="name_under_line">{{ username }}</span> 님! 환영합니다.
+      </h2>
     </article>
 
     <!-- 챗 룸 -->
@@ -165,8 +167,8 @@
       <section class="chat_user_message">
         <h2>개인메세지 {{ user_id }}</h2>
         <ul>
-          <template v-for="v in msg" :key="v">
-            <li style="color: black">{{ v.username }} : {{ v.message }}</li>
+          <template >
+            <li v-for="(v,i) in msg" style="color: black" :key="i">{{ v.username }} : {{ v.message }}</li>
           </template>
         </ul>
         <button @click="user_id = ''">나가기</button>
@@ -177,6 +179,7 @@
       </article>
       <section class="chat_user_list" v-show="isOpen">
         <h2>유저 리스트</h2>
+        <hr />
         <ul class="chat_user_list_ul">
           <template v-for="v in userList" :key="v">
             <li
@@ -184,10 +187,10 @@
               @click="user_message(v.id)"
               v-if="v.username == username"
             >
-              <b>{{ v.username }} : {{ v.id }}</b>
+              <b>{{ v.username }}({{ v.id }})</b>
             </li>
             <li class="list_item" @click="user_message(v.id)" v-else>
-              {{ v.username }} : {{ v.id }}
+              {{ v.username }}({{ v.id }})
             </li>
           </template>
         </ul>
@@ -379,6 +382,7 @@ body {
   font-family: "Orbit", sans-serif;
 }
 
+/* 스크롤 바 */
 body::-webkit-scrollbar {
   width: 5px;
   background-color: white;
@@ -394,11 +398,13 @@ body::-webkit-scrollbar-button {
   width: 3px;
   margin: 2px;
 }
+
 /* 모달 전 로그인 버튼 화면 */
 div.main_login {
   margin: 0;
   display: flex;
   align-items: center;
+  filter: opacity(1.5);
   justify-content: center;
   position: fixed;
   flex-direction: column;
@@ -407,14 +413,30 @@ div.main_login {
   left: 0;
   width: 100%;
   min-width: 350px;
+  animation: appear 1s 1;
   height: 100%;
   background-image: url(../../UI_인덱스수정/이미지/img1.jpg);
   background-size: cover;
 }
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
 div.main_login p {
+  text-shadow: 5px 5px 2px rgba(0, 0, 0, 0.759);
   color: white;
   font-size: 2rem;
   margin-bottom: 60px;
+  animation: ani1 1s 1;
+}
+
+@keyframes ani1 {
+  from {
+    transform: scale(0.6) translateY(-100px);
+  }
 }
 div.main_login button {
   font-size: 2rem;
@@ -423,12 +445,22 @@ div.main_login button {
   height: 100px;
   background-color: rgba(255, 255, 255, 0.301);
   border: 0;
+  box-shadow: inset 0 0 0 0, 15px 15px 5px 2px rgba(0, 0, 0, 0.296);
   border-radius: 20px;
+  transition: 0.5s;
+  animation: ani2 1s 1;
 }
 div.main_login button:hover {
   color: black;
-  background-color: rgba(105, 105, 105, 0.301);
-  border: 0;
+  background: rgba(255, 255, 255, 0.736);
+  cursor: pointer;
+}
+
+@keyframes ani2 {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.5);
+  }
 }
 /* 로그인 창 css */
 .login_main {
@@ -446,7 +478,31 @@ div.main_login button:hover {
   align-items: center;
   flex-direction: column;
 }
+
+.login input{
+  margin-top: 0.5rem;
+  background: black;
+  border-radius:5px ;
+  padding: 10px !important;
+  color:white
+}
+
+.login button {
+  border: none;
+  background: black;
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  transition: 0.7s;
+  cursor: pointer;
+}
+
+.login button:disabled {
+  color: white;
+  background: white;
+}
 .login input {
+  padding: 5px;
   margin-bottom: 30px;
   border: none;
   border-bottom: 1px solid black;
@@ -456,6 +512,25 @@ div.main_login button:hover {
   outline-style: none;
 }
 
+.modal-footer button {
+  border: none;
+  background: black;
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  transition: 0.7s;
+}
+
+.modal-footer button:hover {
+  background: rgb(197, 10, 47);
+  cursor: pointer;
+}
+
+/* 로그인한 유저의 이름 밑줄 */
+.name_under_line {
+  text-decoration: underline wavy rgb(251, 47, 135);
+  color: rgb(0, 0, 0);
+}
 /* 로그인 상태 표시 */
 .connect_server {
   background-color: rgb(255, 255, 255);
@@ -642,7 +717,7 @@ li {
   width: 60px;
   right: 15px;
   text-align: center;
-  top: 10%;
+  top: 11%;
 }
 
 .chat_user_list {
@@ -661,7 +736,16 @@ li {
 }
 
 .chat_user_list h2 {
+  background: gray;
   text-align: center;
+  margin: 0;
+  padding: 13px;
+  border-top-left-radius: 19px;
+  border-top-right-radius: 19px;
+}
+
+hr{
+  margin: 0;
 }
 
 .chat_user_list ul {
@@ -680,10 +764,8 @@ li {
   flex-direction: column;
   align-items: center;
   width: 80px;
-
   position: fixed;
   border-radius: 20px;
-
   right: 20px;
   bottom: 30px;
 }
