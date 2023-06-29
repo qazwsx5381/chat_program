@@ -3,8 +3,17 @@ const { Server } = require("socket.io");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
+const path = require("path");
 
-// const _path = path.join(__dirname)
+app.listen(8080, () => {
+  console.log("server on");
+});
+
+app.use("/", express.static(path.join(__dirname, "../frontend/dist")));
+// 이 부분이 없으면 아래코드에서 index.html을 로드하지 못한다.
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
 
 const io = new Server(server, {
   cors: {
@@ -13,14 +22,13 @@ const io = new Server(server, {
 });
 
 let messages = [];
-let user_msg = [];
 let usernameList = [];
 const chatBotHello = ["안녕", "ㅎㅇ", "반가워", "hello", "반갑습니다", "hi"];
 const chatBotDate = ["현재 시간", "며칠", "시각", "date", "clock"];
 const chatBotWeather = ["날씨"];
 const chatBotLaugh = ["zzz", "ㅋㅋ", "ㅋㅋㅋㅋㅋㅋㅋ", "ㅎㅎㅎㅎ", "ㅎ"];
 const chatBotNo = ["아니", "거절", "귓속말", "부족함"];
-const chatBotYes = ["잘했네", "좋네", ""];
+const chatBotYes = ["잘했네", "좋네", "?"];
 let count = 0;
 
 let roomName = "";
@@ -101,8 +109,13 @@ io.on("connection", (socket) => {
     });
 
     // 특정 조건 만족시 트리거 발동
-
-    const regexp = new RegExp(data.message, "gi");
+    let regexp = "";
+    if (data.message === "?" || data.message === "$") {
+      io.to(roomName).emit("messages", messages);
+      return;
+    } else {
+      regexp = new RegExp(data.message, "gi");
+    }
 
     try {
       for (let i = 0; i < chatBotHello.length; i++) {

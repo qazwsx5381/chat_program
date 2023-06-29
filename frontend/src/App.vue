@@ -110,7 +110,7 @@
               style="
                 color: white;
                 margin-right: 10px;
-                width: 45px;
+                width: 50px;
                 display: flex;
                 align-items: center;
               "
@@ -128,6 +128,8 @@
               v-model="user_msg"
               :disabled="!state"
               @keyup.enter="[send_user_msg(), handleClick()]"
+              placeholder="채팅을 입력하세요"
+              required
             />
             <button @click="[send_user_msg(), handleClick()]">전송</button>
             <button @click="leaveChat">나가기</button>
@@ -138,7 +140,7 @@
               style="
                 color: white;
                 margin-right: 10px;
-                width: 45px;
+                width: 50px;
                 display: flex;
                 align-items: center;
               "
@@ -156,6 +158,8 @@
               v-model="message"
               :disabled="!state"
               @keyup.enter="[sendChat(), handleClick()]"
+              placeholder="채팅을 입력하세요"
+              required
             />
             <button @click="[sendChat(), handleClick()]">전송</button>
             <button @click="leaveChat">나가기</button>
@@ -167,8 +171,10 @@
       <section class="chat_user_message">
         <h2>개인메세지 {{ user_id }}</h2>
         <ul>
-          <template >
-            <li v-for="(v,i) in msg" style="color: black" :key="i">{{ v.username }} : {{ v.message }}</li>
+          <template>
+            <li v-for="(v, i) in msg" style="color: black" :key="i">
+              {{ v.username }} : {{ v.message }}
+            </li>
           </template>
         </ul>
         <button @click="user_id = ''">나가기</button>
@@ -185,7 +191,7 @@
             <li
               class="list_item"
               @click="user_message(v.id)"
-              v-if="v.username == username"
+              v-if="v.id == login_id"
             >
               <b>{{ v.username }}({{ v.id }})</b>
             </li>
@@ -290,13 +296,17 @@ export default {
     sendChat() {
       console.log("sendChat() :서버로 데이터 보냄");
       console.log(this.ghost_user);
-      console.log(this.ghost_user);
-      this.socket.emit("sendMessage", {
-        message: this.message,
-        username: this.username,
-        ghost: this.ghost_user,
-        id: this.login_id,
-      });
+      if (!this.message) {
+        alert("메시지를 입력하세요");
+        return;
+      } else {
+        this.socket.emit("sendMessage", {
+          message: this.message,
+          username: this.username,
+          ghost: this.ghost_user,
+          id: this.login_id,
+        });
+      }
       console.log(this.message);
       this.message = "";
     },
@@ -479,12 +489,12 @@ div.main_login button:hover {
   flex-direction: column;
 }
 
-.login input{
+.login input {
   margin-top: 0.5rem;
   background: black;
-  border-radius:5px ;
+  border-radius: 5px;
   padding: 10px !important;
-  color:white
+  color: white;
 }
 
 .login button {
@@ -744,7 +754,7 @@ li {
   border-top-right-radius: 19px;
 }
 
-hr{
+hr {
   margin: 0;
 }
 
