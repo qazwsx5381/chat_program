@@ -1,25 +1,28 @@
-const express = require("express");
 const { Server } = require("socket.io");
+const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
+const io = new Server(server);
 const path = require("path");
+const cors = require("cors");
+// import cors from "cors";
 
-// let PORT =8080
-// app.listen(PORT, () => {
-//   console.log("server on",PORT);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: true, // 모든 출처 허용 옵션. true 를 써도 된다.
+//   })
+// );
+// app.use((req, res) => {
+//   res.setHeader("Access-Control-Allow-origin", "*"); // 모든 출처(orogin)을 허용
+//   // res.writeHead(200, { "Content-Type": "text/plain" });
+//   // res.end("ok");
 // });
-
-app.use("/", express.static(path.join(__dirname, "../frontend/dist")));
+app.use("/", express.static(path.join(__dirname, "./public")));
 // 이 부분이 없으면 아래코드에서 index.html을 로드하지 못한다.
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-});
-
-const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:8001","http://192.168.0.91:8001"],
-  },
+  res.sendFile(path.join(__dirname, "./public/index.html"));
 });
 
 let messages = [];
@@ -118,114 +121,115 @@ io.on("connection", (socket) => {
       regexp = new RegExp(data.message, "gi");
     }
 
-    try {
-      for (let i = 0; i < chatBotHello.length; i++) {
-        /* 봇이 현재 시간 알려줌*/
+    for (let i = 0; i < chatBotHello.length; i++) {
+      /* 봇이 현재 시간 알려줌*/
 
-        console.log("현재 시간:", data.message);
-        if (regexp.test(chatBotDate[i])) {
+      console.log("현재 시간:", data.message);
+      if (regexp.test(chatBotDate[i])) {
+        io.to(roomName).emit(
+          "messages",
+          messages.push({
+            message: `현재 시간은 ${new Date().toLocaleString()} 입니다.`,
+            id: "🤖(bot)",
+          })
+        );
+      }
+
+      /* 봇이 현재 날씨 확인 가능한 사이트 알려줌 */
+      if (regexp.test(chatBotWeather[i])) {
+        io.to(roomName).emit(
+          "messages",
+          messages.push({
+            message: `날씨가 궁금하군요? https://www.google.com/search?q=%EC%98%A4%EB%8A%98+%EB%82%A0%EC%94%A8 여기 방문해보세요`,
+            id: "🤖(bot)",
+          })
+        );
+      }
+
+      /* 봇이 유저가 웃으면 그에 대한 반응을 보여줌 */
+      if (regexp.test(chatBotLaugh[i])) {
+        io.to(roomName).emit(
+          "messages",
+          messages.push({
+            message: `뭐가 그리 재밌어요?! 재밌는 이야기 해드릴까요?`,
+            id: "🤖(bot)",
+          })
+        );
+
+        /* 유저가 그래 혹은 어 라고 말하면 부정적으로 답변해줌 */
+      } else if (data.message === "그래" || data.message === "어") {
+        io.to(roomName).emit(
+          "messages",
+          messages.push({
+            message: `시른데`,
+            id: "🤖(bot)",
+          })
+        );
+        break;
+      }
+
+      /* 유저가 부정적으로 말하면 봇이 실망한 듯이 말해줌 */
+      if (regexp.test(chatBotNo[i])) {
+        io.to(roomName).emit(
+          "messages",
+          messages.push({
+            message: `아.. 그렇군요.`,
+            id: "🤖(bot)",
+          })
+        );
+      }
+
+      /* 유저가 긍정적으로 말하면 긍정적으로 답변 해줌 */
+      if (regexp.test(chatBotYes[i])) {
+        io.to(roomName).emit(
+          "messages",
+          messages.push({
+            message: `고마워요! 보는 눈이 있으시네요.`,
+            id: "🤖(bot)",
+          })
+        );
+      }
+
+      /* 유조가 인사하면 인사해줌 */
+      if (regexp.test(chatBotHello[i])) {
+        if (count < 4) {
           io.to(roomName).emit(
             "messages",
             messages.push({
-              message: `현재 시간은 ${new Date().toLocaleString()} 입니다.`,
+              message: `안녕하세요.${
+                data.ghost === true ? "익명" : data.username
+              }님 반가워요(😁). 좋은 날 입니다.`,
               id: "🤖(bot)",
             })
           );
+          ++count;
         }
-
-        /* 봇이 현재 날씨 확인 가능한 사이트 알려줌 */
-        if (regexp.test(chatBotWeather[i])) {
+        /* 인사를 3번 받으면 갑자기 급변하여 대충 인사 해줌 */
+        if (count === 3) {
           io.to(roomName).emit(
             "messages",
             messages.push({
-              message: `날씨가 궁금하군요? https://www.google.com/search?q=%EC%98%A4%EB%8A%98+%EB%82%A0%EC%94%A8 여기 방문해보세요`,
+              message: `${count}번 이나 말했는데..끝이 없네.. 대충하자`,
               id: "🤖(bot)",
             })
           );
-        }
-
-        /* 봇이 유저가 웃으면 그에 대한 반응을 보여줌 */
-        if (regexp.test(chatBotLaugh[i])) {
+        } else if (count === 4) {
           io.to(roomName).emit(
             "messages",
             messages.push({
-              message: `뭐가 그리 재밌어요?! 재밌는 이야기 해드릴까요?`,
+              message: `${
+                data.ghost === true ? "익명" : data.username
+              }, ㅎㅇ🥱`,
               id: "🤖(bot)",
             })
           );
-
-          /* 유저가 그래 혹은 어 라고 말하면 부정적으로 답변해줌 */
-        } else if (data.message === "그래" || data.message === "어") {
-          io.to(roomName).emit(
-            "messages",
-            messages.push({
-              message: `시른데`,
-              id: "🤖(bot)",
-            })
-          );
-          break;
-        }
-
-        /* 유저가 부정적으로 말하면 봇이 실망한 듯이 말해줌 */
-        if (regexp.test(chatBotNo[i])) {
-          io.to(roomName).emit(
-            "messages",
-            messages.push({
-              message: `아.. 그렇군요.`,
-              id: "🤖(bot)",
-            })
-          );
-        }
-
-        /* 유저가 긍정적으로 말하면 긍정적으로 답변 해줌 */
-        if (regexp.test(chatBotYes[i])) {
-          io.to(roomName).emit(
-            "messages",
-            messages.push({
-              message: `고마워요! 보는 눈이 있으시네요.`,
-              id: "🤖(bot)",
-            })
-          );
-        }
-
-        /* 유조가 인사하면 인사해줌 */
-        if (regexp.test(chatBotHello[i])) {
-          if (count < 4) {
-            io.to(roomName).emit(
-              "messages",
-              messages.push({
-                message: `안녕하세요.${data.username}님 반가워요(😁). 좋은 날 입니다.`,
-                id: "🤖(bot)",
-              })
-            );
-            ++count;
-          }
-          /* 인사를 3번 받으면 갑자기 급변하여 대충 인사 해줌 */
-          if (count === 3) {
-            io.to(roomName).emit(
-              "messages",
-              messages.push({
-                message: `${count}번 이나 말했는데..끝이 없네.. 대충하자`,
-                id: "🤖(bot)",
-              })
-            );
-          } else if (count === 4) {
-            io.to(roomName).emit(
-              "messages",
-              messages.push({
-                message: `${data.username}, ㅎㅇ🥱`,
-                id: "🤖(bot)",
-              })
-            );
-          }
         }
       }
-    } catch (error) {
-      console.log(error);
     }
+    io.to(roomName).emit("messages", messages);
 
     // 수신 받은 메시지의 목록을 클라이언트에게 돌려줌
-    io.to(roomName).emit("messages", messages);
+
     // ===============================
 
     //개인 메세지 방 가입
@@ -262,7 +266,12 @@ io.on("connection", (socket) => {
   });
 });
 
-let port = 8001;
+let port = 3000;
 server.listen(port, () => {
-  console.log("----서버 정상 오픈----",port);
+  console.log("----서버 정상 오픈----", port);
 });
+
+// let PORT = 8000;
+// app.listen(PORT, () => {
+//   console.log("server on", PORT);
+// });

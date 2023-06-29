@@ -157,11 +157,11 @@
               type="text"
               v-model="message"
               :disabled="!state"
-              @keyup.enter="[sendChat(), handleClick()]"
+              @keyup.enter="[sendChat()]"
               placeholder="채팅을 입력하세요"
               required
             />
-            <button @click="[sendChat(), handleClick()]">전송</button>
+            <button @click="[sendChat()]">전송</button>
             <button @click="leaveChat">나가기</button>
           </template>
         </div>
@@ -187,16 +187,16 @@
         <h2>유저 리스트</h2>
         <hr />
         <ul class="chat_user_list_ul">
-          <template v-for="v in userList" :key="v">
+          <template v-for="(v, i) in userList" :key="i">
             <li
               class="list_item"
               @click="user_message(v.id)"
               v-if="v.id == login_id"
             >
-              <b>{{ v.username }}({{ v.id }})</b>
+              <b>{{ v.username }} (본인)</b>
             </li>
             <li class="list_item" @click="user_message(v.id)" v-else>
-              {{ v.username }}({{ v.id }})
+              {{ v.username }}
             </li>
           </template>
         </ul>
@@ -238,7 +238,7 @@ export default {
 
   async created() {
     // 소켓 서버와 연결, 서버에서 지정해둔 io.on('connection') 이벤트 발생
-    this.socket = io("http://localhost:8001/");
+    this.socket = io("192.168.0.20:3000");
     this.socket.on("connection", () => {});
 
     // 서버에서 메시지를 전달 받음
@@ -358,6 +358,7 @@ export default {
       this.guideMsg = this.username + "님이 방을 나가셨습니다.";
       console.log(this.guideMsg);
       this.username = "";
+      this.ghost_user = false;
     },
     openModal() {
       this.modal = true;

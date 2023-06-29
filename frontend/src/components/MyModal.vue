@@ -36,17 +36,13 @@ div.modal-window {
   max-width: 380px;
   min-height: 35%;
   height: 30%;
-  background:  #fff;
+  background: #fff;
   border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
   bottom: 35%;
   box-shadow: 15px 15px 5px 2px rgba(0, 0, 0, 0.664);
-}
-
-div.modal-window h2{
-
 }
 
 div.modal-content {
