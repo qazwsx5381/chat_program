@@ -5,9 +5,10 @@ const app = express();
 const server = http.createServer(app);
 const path = require("path");
 
-app.listen(8080, () => {
-  console.log("server on");
-});
+// let PORT =8080
+// app.listen(PORT, () => {
+//   console.log("server on",PORT);
+// });
 
 app.use("/", express.static(path.join(__dirname, "../frontend/dist")));
 // 이 부분이 없으면 아래코드에서 index.html을 로드하지 못한다.
@@ -17,7 +18,7 @@ app.get("/", (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:8080"],
+    origin: ["http://localhost:8001","http://192.168.0.91:8001"],
   },
 });
 
@@ -261,6 +262,7 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(8001, () => {
-  console.log("----서버 정상 오픈----");
+let port = 8001;
+server.listen(port, () => {
+  console.log("----서버 정상 오픈----",port);
 });
